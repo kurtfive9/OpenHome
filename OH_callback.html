@@ -68,7 +68,6 @@
     .status { margin-top: 10px; font-size: 0.9rem; color: var(--muted); }
     .ok { color: var(--ok); } .warn { color: var(--warn); } .err { color: var(--err); }
 
-    /* Calendar */
     .date-wrap { position: relative; }
     .calendar {
       position: absolute; top: calc(100% + 6px); left: 0; z-index: 1000;
@@ -93,7 +92,7 @@
   <div class="wrap">
     <div class="header">
       <h1>Callback Form</h1>
-      <div class="subtitle">Save → calls Web2Campaign AddToList with <code>F9TimeToCall</code>.</div>
+      <div class="subtitle">Save → Web2Campaign AddToList with <code>F9TimeToCall</code>.</div>
     </div>
 
     <div class="card">
@@ -110,21 +109,9 @@
         </div>
 
         <div>
-          <label for="phone">Phone Number</label>
-          <input id="phone" name="phone" type="tel" placeholder="+1 (555) 555‑1234" inputmode="tel" />
-          <div class="tip">Prefills from ANI; if missing, falls back to DNIS.</div>
-        </div>
-
-        <div class="row two">
-          <div>
-            <label for="campaign">Current Campaign</label>
-            <input id="campaign" name="campaign" type="text" placeholder="Spring Outreach" />
-          </div>
-          <div>
-            <label for="list">Current List</label>
-            <input id="list" name="list" type="text" placeholder="Callback" value="Callback" />
-            <div class="tip">API uses constant “Callback”. This field is just for display.</div>
-          </div>
+          <label for="phone">Phone Number (10 digits)</label>
+          <input id="phone" name="phone" type="tel" inputmode="numeric" pattern="\\d{10}" placeholder="e.g., 5551234567" />
+          <div class="tip">Only 10 digits are accepted.</div>
         </div>
 
         <div class="row two">
@@ -174,16 +161,11 @@
   </div>
 
   <script>
-    /************ CONSTANTS ************/
-    // Domain & List constants as requested
-    const F9_DOMAIN_DEFAULT = 'Five9 TAM DEMO - Kurt Laya';
-    const F9_LIST_CONSTANT  = 'Callback';
-    const WEB2CAMPAIGN_URL  = 'https://api.five9.com/web2campaign/AddToList';
-
-    // Show the final URL we call (for validation while setting up)
+    const F9_DOMAIN = 'Five9 TAM DEMO - Kurt Laya';
+    const F9_LIST   = 'Callback';
+    const W2C_BASE  = 'https://api.five9.com/web2campaign/AddToList';
     const SHOW_DEBUG_URL = true;
 
-    /************ UTILITIES ************/
     const $  = (id) => document.getElementById(id);
     const pad = (n) => String(n).padStart(2, '0');
 
@@ -191,45 +173,30 @@
       const el = $('status'); el.textContent = msg; el.className = 'status ' + cls;
     }
 
-    function sanitizePhone(raw) {
-      if (!raw) return '';
-      // Keep leading '+' if present, strip other non-digits
-      const t = raw.trim();
-      if (t.startsWith('+')) return '+' + t.slice(1).replace(/\D/g, '');
-      return t.replace(/\D/g, '');
+    function onlyDigits(s) { return (s || '').replace(/\D/g, ''); }
+    function toTenDigits(raw) {
+      const d = onlyDigits(raw);
+      if (d.length === 10) return d;
+      if (d.length > 10) return d.slice(-10);
+      return d;
     }
 
-    /************ PREFILL FROM CONNECTOR (GET) ************/
-    (function prefillFromFive9Query() {
-      const raw = new URLSearchParams(window.location.search);
-      const map = {};
-      for (const [k, v] of raw.entries()) map[k.toLowerCase()] = v;
-
-      const getAny = (...keys) => {
-        for (const k of keys) {
-          const val = map[k.toLowerCase()];
-          if (val != null && val !== '') return decodeURIComponent(val);
-        }
+    (function prefill() {
+      const q = new URLSearchParams(location.search);
+      const get = (...keys) => {
+        for (const k of keys) if (q.has(k)) return decodeURIComponent(q.get(k));
         return '';
       };
-
-      const first = getAny('first_name', 'customer.first_name');
-      const last  = getAny('last_name', 'customer.last_name');
-      const camp  = getAny('campaign_name', 'call.campaign_name');
-
-      const ani  = getAny('ani', 'call.ani', 'phone');
-      const dnis = getAny('dnis', 'call.dnis');
-      const phone = ani || dnis;
-
+      const first = get('first_name','Customer.first_name');
+      const last  = get('last_name','Customer.last_name');
+      const ani   = get('ani','ANI','Call.ANI','phone');
+      const dnis  = get('dnis','DNIS','Call.DNIS');
       if (first) $('firstName').value = first;
       if (last)  $('lastName').value  = last;
-      if (camp)  $('campaign').value  = camp;
-      if (phone) $('phone').value     = phone;
-      // Show the configured list constant in the field for clarity
-      $('list').value = F9_LIST_CONSTANT;
+      const phoneGuess = toTenDigits(ani || dnis);
+      if (phoneGuess.length === 10) $('phone').value = phoneGuess;
     })();
 
-    /************ TIME PICKLIST (12h labels / 24h value) ************/
     const timePicklist = $('timePicklist');
     const timeHidden   = $('callbackTime');
 
@@ -244,18 +211,16 @@
       timePicklist.innerHTML = '';
       const ph = document.createElement('option'); ph.value = ''; ph.textContent = '— Select a time —';
       timePicklist.appendChild(ph);
-
       const [sH, sM] = start.split(':').map(Number);
       const [eH, eM] = end.split(':').map(Number);
       const startMin = sH * 60 + sM;
       const endMin = eH * 60 + eM;
-
       for (let m = startMin; m <= endMin; m += stepMinutes) {
         const hr24 = Math.floor(m / 60);
         const mm = m % 60;
         const opt = document.createElement('option');
-        opt.value = `${pad(hr24)}:${pad(mm)}`;      // stored value (24h)
-        opt.textContent = to12(hr24, mm);          // 12h label
+        opt.value = `${pad(hr24)}:${pad(mm)}`;
+        opt.textContent = to12(hr24, mm);
         timePicklist.appendChild(opt);
       }
     }
@@ -273,12 +238,11 @@
       if (min === 60) { min = 0; hr = (hr + 1) % 24; }
       buildTimePicklist(15, "00:00", "23:59");
       const v = `${pad(hr)}:${pad(min)}`;
-      const opt = [...timePicklist.options].find(o => o.value === v);
+      const opt = Array.from(timePicklist.options).find(o => o.value === v);
       timePicklist.value = opt ? v : '';
       timeHidden.value = timePicklist.value || '';
     })();
 
-    /************ CALENDAR ************/
     const dateText   = $('callbackDateText');
     const dateHidden = $('callbackDate');
     const calendar   = $('calendar');
@@ -289,14 +253,12 @@
     let calYear, calMonth;
 
     function fmtYMD(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-
     function openCalendar() {
       const base = dateHidden.value ? new Date(dateHidden.value) : new Date();
       calYear = base.getFullYear(); calMonth = base.getMonth();
       buildCalendarGrid(calYear, calMonth); calendar.classList.add('visible');
     }
     function closeCalendar() { calendar.classList.remove('visible'); }
-
     function buildCalendarGrid(year, month) {
       calGrid.innerHTML = '';
       const dows = ['Su','Mo','Tu','We','Th','Fr','Sa'];
@@ -307,46 +269,36 @@
       const first = new Date(year, month, 1);
       const startDow = first.getDay();
       const dim = new Date(year, month + 1, 0).getDate();
-
       for (let i = 0; i < startDow; i++) calGrid.appendChild(document.createElement('div'));
-
       const today = new Date(); const tY = today.getFullYear(), tM = today.getMonth(), tD = today.getDate();
-      for (let d = 1; d <= dim; d++) {
+      for (let d=1; d<=dim; d++) {
         const btn = document.createElement('button');
-        btn.type = 'button'; btn.className = 'cal-day'; btn.textContent = d;
-        if (year === tY && month === tM && d === tD) btn.classList.add('today');
+        btn.type='button'; btn.className='cal-day'; btn.textContent=d;
+        if (year===tY && month===tM && d===tD) btn.classList.add('today');
         btn.addEventListener('click', (ev) => {
           ev.stopPropagation();
           const chosen = new Date(year, month, d);
           const ymd = fmtYMD(chosen);
-          dateHidden.value = ymd; dateText.value = ymd;
-          closeCalendar(); dateText.focus();
+          dateHidden.value = ymd; dateText.value = ymd; closeCalendar(); dateText.focus();
         });
         calGrid.appendChild(btn);
       }
       calLabel.textContent = new Date(year, month, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' });
     }
-
     dateText.addEventListener('click', (e) => { e.stopPropagation(); openCalendar(); });
     dateText.addEventListener('focus', (e) => { e.stopPropagation(); openCalendar(); });
-    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } buildCalendarGrid(calYear, calMonth); });
-    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } buildCalendarGrid(calYear, calMonth); });
-    document.addEventListener('click', (e) => {
-      if (calendar.classList.contains('visible')) {
-        const inside = calendar.contains(e.target) || e.target === dateText;
-        if (!inside) closeCalendar();
-      }
-    });
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); calMonth--; if (calMonth<0){calMonth=11; calYear--;} buildCalendarGrid(calYear, calMonth); });
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); calMonth++; if (calMonth>11){calMonth=0; calYear++;} buildCalendarGrid(calYear, calMonth); });
+    document.addEventListener('click', (e) => { if (calendar.classList.contains('visible')) { const inside = calendar.contains(e.target) || e.target === dateText; if (!inside) closeCalendar(); } });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCalendar(); });
 
-    (function presetToday() {
+    (function presetToday(){
       const today = new Date();
       const ymd = fmtYMD(today);
       if (!dateHidden.value) dateHidden.value = ymd;
       if (!dateText.value)   dateText.value   = ymd;
     })();
 
-    /************ TIMEZONE & OFFSET (US only) ************/
     const tzSelect   = $('timezone'); const offsetField = $('offset');
     const US_TIMEZONES = [
       { id: "America/New_York",   label: "Eastern — America/New_York" },
@@ -413,122 +365,112 @@
     }
     tzSelect.addEventListener('change', updateOffset);
 
-    /************ BUILD F9 TIME STRINGS ************/
-    // Using "MM dd, yyyy hh:mm a z" (AM/PM + short timezone like PST/PDT/EST/EDT)
     function getTimeFormatAndValue() {
-      const dateStr = $('callbackDate').value;      // yyyy-mm-dd
-      const time24  = $('callbackTime').value;      // HH:MM (24h)
+      const dateStr = $('callbackDate').value;
+      const time24  = $('callbackTime').value;
       const tzIana  = $('timezone').value || 'America/Los_Angeles';
-
       if (!dateStr || !time24) return null;
-
       const [y, m, d] = dateStr.split('-').map(Number);
       const [H, M]    = time24.split(':').map(Number);
-
-      // Create a UTC date representing the intended local wall-clock time in tz,
-      // then format it back into that tz to extract correct components + short tz.
       const dt = new Date(Date.UTC(y, m-1, d, H, M, 0));
-
-      // Short TZ (PST/PDT/EST/EDT/…)
       const shortTZ = new Intl.DateTimeFormat('en-US', {
         timeZone: tzIana, timeZoneName: 'short',
         month: '2-digit', day: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit', hour12: true
       }).formatToParts(dt).find(p => p.type === 'timeZoneName')?.value || 'PST';
-
       const parts = new Intl.DateTimeFormat('en-US', {
         timeZone: tzIana, month: '2-digit', day: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit', hour12: true
       }).formatToParts(dt);
-
       const get = (t) => parts.find(p => p.type === t)?.value || '';
       const MM = get('month'), DD = get('day'), YYYY = get('year');
-      const HH12 = get('hour'), MIN = get('minute'), DAYPERIOD = get('dayPeriod'); // AM/PM
-
+      const HH12 = get('hour'), MIN = get('minute'), DAYPERIOD = get('dayPeriod');
       return {
         F9TimeFormat: 'MM dd, yyyy hh:mm a z',
         F9TimeToCall: `${MM} ${DD}, ${YYYY} ${HH12}:${MIN} ${DAYPERIOD} ${shortTZ}`
       };
     }
 
-    /************ SAVE → CALL WEB2CAMPAIGN ************/
-    function urlParam(name, value) {
-      return `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
-    }
-
-    function getF9Domain() {
-      const q = new URLSearchParams(window.location.search);
-      return q.get('f9domain') || F9_DOMAIN_DEFAULT || '';
-    }
-
-    function buildWeb2CampaignUrl() {
-      const domain = getF9Domain();
-      const phoneRaw = $('phone').value || '';
-      const phone    = sanitizePhone(phoneRaw);
-
+    function buildAddToListUrl() {
+      const raw = $('phone').value || '';
+      const ten = toTenDigits(raw);
+      if (ten.length !== 10) return { ok:false, reason:'Phone must be exactly 10 digits' };
       const t = getTimeFormatAndValue();
-      if (!t) return { url: '', reason: 'Missing date/time' };
-
-      if (!domain) return { url: '', reason: 'Missing F9domain (set constant or add ?f9domain=...)' };
-      if (!phone)  return { url: '', reason: 'Missing Phone Number' };
-
-      const qp = [
-        urlParam('F9domain',      domain),
-        urlParam('F9list',        F9_LIST_CONSTANT),
-        urlParam('number1',       phone),
-        urlParam('F9TimeFormat',  t.F9TimeFormat),
-        urlParam('F9TimeToCall',  t.F9TimeToCall)
-      ].join('&');
-
-      return { url: `${WEB2CAMPAIGN_URL}?${qp}`, reason: '' };
+      if (!t) return { ok:false, reason:'Missing date/time' };
+      const p = new URLSearchParams({
+        F9domain: F9_DOMAIN,
+        F9list:   F9_LIST,
+        number1:  ten,
+        F9TimeFormat: t.F9TimeFormat,
+        F9TimeToCall: t.F9TimeToCall,
+        F9retResults: 'true'
+      });
+      const first = $('firstName').value || '';
+      const last  = $('lastName').value  || '';
+      if (first) p.set('first_name', first);
+      if (last)  p.set('last_name',  last);
+      return { ok:true, url: `${W2C_BASE}?${p.toString()}` };
     }
 
-    function sendGetViaImage(url, onDone) {
-      const img = new Image();
-      img.onload  = () => onDone(true);
-      img.onerror = () => onDone(false);
-      img.src = url + '&_=' + Date.now(); // cache buster
+    function fireGetInHiddenFrame(url) {
+      let frame = $('w2cFrame');
+      if (!frame) {
+        frame = document.createElement('iframe');
+        frame.id = 'w2cFrame';
+        frame.style.position = 'absolute';
+        frame.style.left = '-9999px';
+        frame.style.top = '-9999px';
+        frame.width = 1; frame.height = 1;
+        frame.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(frame);
+      }
+      frame.src = url + '&_=' + Date.now();
     }
 
     $('callbackForm').addEventListener('submit', (e) => {
       e.preventDefault();
 
+      const ten = toTenDigits($('phone').value || '');
+      if (ten.length !== 10) {
+        $('phone').setCustomValidity('Enter a 10-digit phone number.');
+        $('phone').reportValidity();
+        return;
+      } else {
+        $('phone').setCustomValidity('');
+        $('phone').value = ten;
+      }
+
       if (!$('callbackTime').value) {
         $('timePicklist').setCustomValidity('Please select a time.');
         $('timePicklist').reportValidity();
         return;
+      } else {
+        $('timePicklist').setCustomValidity('');
       }
 
-      const { url, reason } = buildWeb2CampaignUrl();
-      if (!url) {
-        setStatus('Cannot call Web2Campaign: ' + reason, 'err');
+      const built = buildAddToListUrl();
+      if (!built.ok) {
+        setStatus('Cannot call AddToList: ' + built.reason, 'err');
         return;
       }
 
       if (SHOW_DEBUG_URL) {
         const dbg = $('debug');
         dbg.style.display = 'block';
-        dbg.innerHTML = `<strong>Web2Campaign URL:</strong><br/><code>${url}</code>`;
+        dbg.innerHTML = `<strong>Web2Campaign URL:</strong><br/><code>${built.url}</code>`;
       }
 
-      setStatus('Scheduling call…', '');
-
-      // Fire the GET without CORS hassles (we don’t need to read the response)
-      sendGetViaImage(url, (ok) => {
-        if (ok) setStatus('Submitted to Five9 (F9TimeToCall set).', 'ok');
-        else    setStatus('Submitted (image beacon failed to load). If you need a definitive success/fail, use a server-side proxy.', 'warn');
-      });
+      setStatus('Submitting to Five9…', '');
+      fireGetInHiddenFrame(built.url);
+      setStatus('Submitted. If F9retResults=true, Five9 will return a result payload.', 'ok');
     });
 
-    /************ INIT ************/
     (function init() {
-      // Default date = today
       const today = new Date();
       const ymd = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
       if (!$('callbackDate').value) $('callbackDate').value = ymd;
       if (!$('callbackDateText').value) $('callbackDateText').value = ymd;
 
-      // Build calendar UI
       (function buildCalendarOnce(){
         window.buildCalendarGrid = function(year, month) {
           const calGrid = $('calGrid');
@@ -540,9 +482,7 @@
           const first = new Date(year, month, 1);
           const startDow = first.getDay();
           const dim = new Date(year, month+1, 0).getDate();
-
           for (let i=0;i<startDow;i++) calGrid.appendChild(document.createElement('div'));
-
           const today = new Date(); const tY=today.getFullYear(), tM=today.getMonth(), tD=today.getDate();
           for (let d=1; d<=dim; d++) {
             const btn = document.createElement('button'); btn.type='button'; btn.className='cal-day'; btn.textContent = d;
@@ -555,7 +495,6 @@
             });
             calGrid.appendChild(btn);
           }
-
           $('calLabel').textContent = new Date(year, month, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' });
         };
 
@@ -572,9 +511,7 @@
       })();
 
       populateTimeZonesUS();
-
-      // Initial status hint
-      setStatus('Ready. On Save, we will call Web2Campaign with F9TimeToCall.', '');
+      setStatus('Ready.', '');
     })();
   </script>
 </body>
