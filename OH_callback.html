@@ -6,22 +6,12 @@
   <title>Callback Form</title>
   <style>
     :root {
-      /* Light theme: soft blues */
-      --bg: #f5f9ff;
-      --card: #ffffff;
-      --fg: #0f172a;
-      --muted: #475569;
-      --accent: #2563eb;
-      --accent-2: #3b82f6;
-      --border: #dbe7ff;
-      --ok: #047857;
-      --err: #b91c1c;
-      --radius: 14px;
-      --shadow: 0 10px 24px rgba(2, 28, 77, 0.08);
-      --shadow-inset: 0 0 0 1px rgba(2, 28, 77, 0.03) inset;
-      --field: #f8fbff;
+      --bg: #f5f9ff; --card: #ffffff; --fg: #0f172a; --muted: #475569;
+      --accent: #2563eb; --accent-2: #3b82f6; --border: #dbe7ff;
+      --ok: #047857; --warn: #a16207; --err: #b91c1c;
+      --radius: 14px; --shadow: 0 10px 24px rgba(2, 28, 77, 0.08);
+      --shadow-inset: 0 0 0 1px rgba(2, 28, 77, 0.03) inset; --field: #f8fbff;
     }
-
     * { box-sizing: border-box; }
     body {
       margin: 0; padding: 24px;
@@ -33,17 +23,14 @@
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
       line-height: 1.35;
     }
-
     .wrap { max-width: 860px; margin: 0 auto; }
     .header { margin-bottom: 18px; }
     .header h1 { margin: 0 0 6px; font-size: 1.35rem; color: #0b1b4a; }
     .header .subtitle { color: var(--muted); }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
       box-shadow: var(--shadow), var(--shadow-inset);
     }
 
@@ -55,18 +42,13 @@
     label { display: block; font-size: 0.92rem; color: #0b1b4a; margin-bottom: 6px; }
 
     input[type="text"], input[type="tel"], select {
-      width: 100%; padding: 12px;
-      background: var(--field);
-      border: 1px solid var(--border);
-      color: var(--fg);
-      border-radius: 10px;
-      outline: none;
+      width: 100%; padding: 12px; background: var(--field);
+      border: 1px solid var(--border); color: var(--fg);
+      border-radius: 10px; outline: none;
       transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
     }
     input:focus, select:focus {
-      border-color: #95b8ff;
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.18);
-      background: #ffffff;
+      border-color: #95b8ff; box-shadow: 0 0 0 3px rgba(59,130,246,0.18); background: #ffffff;
     }
 
     .muted-input { color: #0b1b4a; background: #f2f7ff; }
@@ -83,39 +65,35 @@
     button:hover { filter: brightness(1.03); }
     button:active { transform: translateY(1px); }
 
-    .status { margin-top: 8px; font-size: 0.9rem; color: var(--muted); }
-    .ok { color: var(--ok); } .err { color: var(--err); }
+    .status { margin-top: 10px; font-size: 0.9rem; color: var(--muted); }
+    .ok { color: var(--ok); } .warn { color: var(--warn); } .err { color: var(--err); }
 
     /* Calendar */
     .date-wrap { position: relative; }
     .calendar {
       position: absolute; top: calc(100% + 6px); left: 0; z-index: 1000;
       background: #ffffff; border: 1px solid var(--border); border-radius: 12px;
-      width: 320px; max-width: 100%;
-      padding: 12px; box-shadow: var(--shadow);
+      width: 320px; max-width: 100%; padding: 12px; box-shadow: var(--shadow);
       display: none;
     }
     .calendar.visible { display: block; }
     .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; color: #0b1b4a; }
-    .cal-btn {
-      background: #eef5ff; color: #0b1b4a; border: 1px solid var(--border);
-      border-radius: 8px; padding: 4px 8px; cursor: pointer; font-size: 0.85rem;
-    }
+    .cal-btn { background: #eef5ff; color: #0b1b4a; border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; cursor: pointer; font-size: 0.85rem; }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; font-size: 0.92rem; }
     .cal-grid .dow { color: var(--muted); text-align: center; padding: 4px 0; font-weight: 600; }
-    .cal-day {
-      text-align: center; padding: 8px 0; border-radius: 8px; cursor: pointer;
-      border: 1px solid transparent; background: #f8fbff; color: var(--fg);
-    }
+    .cal-day { text-align: center; padding: 8px 0; border-radius: 8px; cursor: pointer; border: 1px solid transparent; background: #f8fbff; color: var(--fg); }
     .cal-day:hover { background: #eaf2ff; border-color: #cfe0ff; }
     .cal-day.today { outline: 1px dashed #60a5fa; }
+
+    .debug { margin-top: 10px; font-size: 0.82rem; color: #334155; }
+    .debug code { word-break: break-all; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="header">
       <h1>Callback Form</h1>
-      <div class="subtitle">Auto?fill from Five9 (URL parameters), schedule, and timezone.</div>
+      <div class="subtitle">Save ‚Üí calls Web2Campaign AddToList with <code>F9TimeToCall</code>.</div>
     </div>
 
     <div class="card">
@@ -133,7 +111,7 @@
 
         <div>
           <label for="phone">Phone Number</label>
-          <input id="phone" name="phone" type="tel" placeholder="+1 (555) 555?1234" inputmode="tel" />
+          <input id="phone" name="phone" type="tel" placeholder="+1 (555) 555‚Äë1234" inputmode="tel" />
           <div class="tip">Prefills from ANI; if missing, falls back to DNIS.</div>
         </div>
 
@@ -144,7 +122,8 @@
           </div>
           <div>
             <label for="list">Current List</label>
-            <input id="list" name="list" type="text" placeholder="Prospects A" />
+            <input id="list" name="list" type="text" placeholder="Callback" value="Callback" />
+            <div class="tip">API uses constant ‚ÄúCallback‚Äù. This field is just for display.</div>
           </div>
         </div>
 
@@ -155,9 +134,9 @@
             <input id="callbackDate" name="callbackDate" type="hidden" />
             <div id="calendar" class="calendar" role="dialog" aria-modal="true" aria-label="Calendar">
               <div class="cal-head">
-                <button type="button" class="cal-btn" id="prevMonth">ã</button>
+                <button type="button" class="cal-btn" id="prevMonth">‚Äπ</button>
                 <div id="calLabel">Month YYYY</div>
-                <button type="button" class="cal-btn" id="nextMonth">õ</button>
+                <button type="button" class="cal-btn" id="nextMonth">‚Ä∫</button>
               </div>
               <div class="cal-grid" id="calGrid"></div>
             </div>
@@ -168,7 +147,7 @@
             <label for="timePicklist">Callback Time</label>
             <select id="timePicklist" aria-label="Time picklist"></select>
             <input type="hidden" id="callbackTime" name="callbackTime" />
-            <div class="tip">12?hour labels; stored as 24?hour HH:MM.</div>
+            <div class="tip">12‚Äëhour labels; stored as 24‚Äëhour HH:MM.</div>
           </div>
         </div>
 
@@ -185,20 +164,42 @@
         </div>
 
         <div class="actions">
-          <button type="submit">Save</button>
+          <button type="submit" id="saveBtn">Save</button>
         </div>
 
         <div id="status" class="status"></div>
+        <div id="debug" class="debug" style="display:none;"></div>
       </form>
     </div>
   </div>
 
   <script>
-    // ---------- Utilities ----------
+    /************ CONSTANTS ************/
+    // Domain & List constants as requested
+    const F9_DOMAIN_DEFAULT = 'Five9 TAM DEMO - Kurt Laya';
+    const F9_LIST_CONSTANT  = 'Callback';
+    const WEB2CAMPAIGN_URL  = 'https://api.five9.com/web2campaign/AddToList';
+
+    // Show the final URL we call (for validation while setting up)
+    const SHOW_DEBUG_URL = true;
+
+    /************ UTILITIES ************/
     const $  = (id) => document.getElementById(id);
     const pad = (n) => String(n).padStart(2, '0');
 
-    // ---------- Robust Five9 URL prefill (case-insensitive, dotted/simple names) ----------
+    function setStatus(msg, cls='') {
+      const el = $('status'); el.textContent = msg; el.className = 'status ' + cls;
+    }
+
+    function sanitizePhone(raw) {
+      if (!raw) return '';
+      // Keep leading '+' if present, strip other non-digits
+      const t = raw.trim();
+      if (t.startsWith('+')) return '+' + t.slice(1).replace(/\D/g, '');
+      return t.replace(/\D/g, '');
+    }
+
+    /************ PREFILL FROM CONNECTOR (GET) ************/
     (function prefillFromFive9Query() {
       const raw = new URLSearchParams(window.location.search);
       const map = {};
@@ -206,34 +207,29 @@
 
       const getAny = (...keys) => {
         for (const k of keys) {
-          const kk = k.toLowerCase();
-          if (kk in map && map[kk] != null && map[kk] !== '') return decodeURIComponent(map[kk]);
+          const val = map[k.toLowerCase()];
+          if (val != null && val !== '') return decodeURIComponent(val);
         }
         return '';
       };
 
-      // Name
-      const first = getAny('Customer.first_name','first_name');
-      if (first) $('firstName').value = first;
+      const first = getAny('first_name', 'customer.first_name');
+      const last  = getAny('last_name', 'customer.last_name');
+      const camp  = getAny('campaign_name', 'call.campaign_name');
 
-      const last = getAny('Customer.last_name','last_name');
-      if (last) $('lastName').value = last;
-
-      // Campaign / List
-      const campaign = getAny('Call.campaign_name','campaign_name');
-      if (campaign) $('campaign').value = campaign;
-
-      const listVal = getAny('Customer.List','list','List');
-      if (listVal) $('list').value = listVal;
-
-      // Phone: prefer ANI; fallback to DNIS
-      const ani  = getAny('ani','Call.ANI','ANI','phone');
-      const dnis = getAny('dnis','Call.DNIS','DNIS');
+      const ani  = getAny('ani', 'call.ani', 'phone');
+      const dnis = getAny('dnis', 'call.dnis');
       const phone = ani || dnis;
-      if (phone) $('phone').value = phone;
+
+      if (first) $('firstName').value = first;
+      if (last)  $('lastName').value  = last;
+      if (camp)  $('campaign').value  = camp;
+      if (phone) $('phone').value     = phone;
+      // Show the configured list constant in the field for clarity
+      $('list').value = F9_LIST_CONSTANT;
     })();
 
-    // ---------- Time picklist (12h labels / 24h hidden value) ----------
+    /************ TIME PICKLIST (12h labels / 24h value) ************/
     const timePicklist = $('timePicklist');
     const timeHidden   = $('callbackTime');
 
@@ -246,7 +242,7 @@
 
     function buildTimePicklist(stepMinutes = 15, start = "00:00", end = "23:59") {
       timePicklist.innerHTML = '';
-      const ph = document.createElement('option'); ph.value = ''; ph.textContent = 'ó Select a time ó';
+      const ph = document.createElement('option'); ph.value = ''; ph.textContent = '‚Äî Select a time ‚Äî';
       timePicklist.appendChild(ph);
 
       const [sH, sM] = start.split(':').map(Number);
@@ -258,8 +254,8 @@
         const hr24 = Math.floor(m / 60);
         const mm = m % 60;
         const opt = document.createElement('option');
-        opt.value = `${pad(hr24)}:${pad(mm)}`;      // stored value
-        opt.textContent = to12(hr24, mm);          // display label
+        opt.value = `${pad(hr24)}:${pad(mm)}`;      // stored value (24h)
+        opt.textContent = to12(hr24, mm);          // 12h label
         timePicklist.appendChild(opt);
       }
     }
@@ -282,7 +278,7 @@
       timeHidden.value = timePicklist.value || '';
     })();
 
-    // ---------- Custom Calendar (always-on) ----------
+    /************ CALENDAR ************/
     const dateText   = $('callbackDateText');
     const dateHidden = $('callbackDate');
     const calendar   = $('calendar');
@@ -314,9 +310,7 @@
 
       for (let i = 0; i < startDow; i++) calGrid.appendChild(document.createElement('div'));
 
-      const today = new Date();
-      const tY = today.getFullYear(), tM = today.getMonth(), tD = today.getDate();
-
+      const today = new Date(); const tY = today.getFullYear(), tM = today.getMonth(), tD = today.getDate();
       for (let d = 1; d <= dim; d++) {
         const btn = document.createElement('button');
         btn.type = 'button'; btn.className = 'cal-day'; btn.textContent = d;
@@ -352,27 +346,24 @@
       if (!dateText.value)   dateText.value   = ymd;
     })();
 
-    // ---------- Timezone (U.S. only) & offset ----------
-    const tzSelect   = $('timezone');
-    const offsetField= $('offset');
-
+    /************ TIMEZONE & OFFSET (US only) ************/
+    const tzSelect   = $('timezone'); const offsetField = $('offset');
     const US_TIMEZONES = [
-      { id: "America/New_York",   label: "Eastern ó America/New_York" },
-      { id: "America/Chicago",    label: "Central ó America/Chicago" },
-      { id: "America/Denver",     label: "Mountain ó America/Denver" },
-      { id: "America/Phoenix",    label: "Arizona (no DST) ó America/Phoenix" },
-      { id: "America/Los_Angeles",label: "Pacific ó America/Los_Angeles" },
-      { id: "America/Anchorage",  label: "Alaska ó America/Anchorage" },
-      { id: "Pacific/Honolulu",   label: "Hawaii ó Pacific/Honolulu" }
+      { id: "America/New_York",   label: "Eastern ‚Äî America/New_York" },
+      { id: "America/Chicago",    label: "Central ‚Äî America/Chicago" },
+      { id: "America/Denver",     label: "Mountain ‚Äî America/Denver" },
+      { id: "America/Phoenix",    label: "Arizona (no DST) ‚Äî America/Phoenix" },
+      { id: "America/Los_Angeles",label: "Pacific ‚Äî America/Los_Angeles" },
+      { id: "America/Anchorage",  label: "Alaska ‚Äî America/Anchorage" },
+      { id: "Pacific/Honolulu",   label: "Hawaii ‚Äî Pacific/Honolulu" }
     ];
 
     function populateTimeZonesUS() {
       tzSelect.innerHTML = '';
       const detected = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-      const ordered = [...US_TIMEZONES].sort((a, b) => (a.id === detected ? -1 : (b.id === detected ? 1 : a.label.localeCompare(b.label))));
+      const ordered = [...US_TIMEZONES].sort((a,b)=> (a.id===detected?-1:(b.id===detected?1:a.label.localeCompare(b.label))));
       for (const z of ordered) {
-        const opt = document.createElement('option');
-        opt.value = z.id; opt.textContent = z.label;
+        const opt = document.createElement('option'); opt.value = z.id; opt.textContent = z.label;
         if (z.id === detected) opt.selected = true;
         tzSelect.appendChild(opt);
       }
@@ -382,8 +373,8 @@
     function formatOffset(minutes) {
       const sign = minutes >= 0 ? '+' : '-';
       const abs = Math.abs(minutes);
-      const hh = String(Math.floor(abs / 60)).padStart(2, '0');
-      const mm = String(abs % 60).padStart(2, '0');
+      const hh = String(Math.floor(abs / 60)).padStart(2,'0');
+      const mm = String(abs % 60).padStart(2,'0');
       return `GMT${sign}${hh}:${mm}`;
     }
 
@@ -396,18 +387,20 @@
           const m = match[0].match(/GMT([+-])(\d{1,2})(?::?(\d{2}))?/);
           if (m) {
             const sign = m[1] === '-' ? -1 : 1;
-            const h = parseInt(m[2], 10);
-            const min = m[3] ? parseInt(m[3], 10) : 0;
-            return formatOffset(sign * (h * 60 + min));
+            const h = parseInt(m[2],10);
+            const min = m[3] ? parseInt(m[3],10) : 0;
+            return `GMT${sign}${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
           }
           return match[0];
         }
       } catch {}
-      // Fallback using part comparison
       try {
         const dateTime = new Date();
-        const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).formatToParts(dateTime);
-        const get = (type) => parts.find(p => p.type === type)?.value || '00';
+        const parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit',
+          hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
+        }).formatToParts(dateTime);
+        const get = (type) => parts.find(p=>p.type===type)?.value || '00';
         const pseudoUTC = Date.parse(`${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}Z`);
         const diffMinutes = Math.round((pseudoUTC - dateTime.getTime()) / 60000);
         return formatOffset(diffMinutes);
@@ -416,37 +409,172 @@
 
     function updateOffset() {
       const tz = tzSelect.value;
-      const off = parseShortOffsetFromParts(tz, new Date());
-      offsetField.value = off;
+      offsetField.value = parseShortOffsetFromParts(tz, new Date());
     }
     tzSelect.addEventListener('change', updateOffset);
 
-    // ---------- Submit ----------
+    /************ BUILD F9 TIME STRINGS ************/
+    // Using "MM dd, yyyy hh:mm a z" (AM/PM + short timezone like PST/PDT/EST/EDT)
+    function getTimeFormatAndValue() {
+      const dateStr = $('callbackDate').value;      // yyyy-mm-dd
+      const time24  = $('callbackTime').value;      // HH:MM (24h)
+      const tzIana  = $('timezone').value || 'America/Los_Angeles';
+
+      if (!dateStr || !time24) return null;
+
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const [H, M]    = time24.split(':').map(Number);
+
+      // Create a UTC date representing the intended local wall-clock time in tz,
+      // then format it back into that tz to extract correct components + short tz.
+      const dt = new Date(Date.UTC(y, m-1, d, H, M, 0));
+
+      // Short TZ (PST/PDT/EST/EDT/‚Ä¶)
+      const shortTZ = new Intl.DateTimeFormat('en-US', {
+        timeZone: tzIana, timeZoneName: 'short',
+        month: '2-digit', day: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      }).formatToParts(dt).find(p => p.type === 'timeZoneName')?.value || 'PST';
+
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: tzIana, month: '2-digit', day: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      }).formatToParts(dt);
+
+      const get = (t) => parts.find(p => p.type === t)?.value || '';
+      const MM = get('month'), DD = get('day'), YYYY = get('year');
+      const HH12 = get('hour'), MIN = get('minute'), DAYPERIOD = get('dayPeriod'); // AM/PM
+
+      return {
+        F9TimeFormat: 'MM dd, yyyy hh:mm a z',
+        F9TimeToCall: `${MM} ${DD}, ${YYYY} ${HH12}:${MIN} ${DAYPERIOD} ${shortTZ}`
+      };
+    }
+
+    /************ SAVE ‚Üí CALL WEB2CAMPAIGN ************/
+    function urlParam(name, value) {
+      return `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
+    }
+
+    function getF9Domain() {
+      const q = new URLSearchParams(window.location.search);
+      return q.get('f9domain') || F9_DOMAIN_DEFAULT || '';
+    }
+
+    function buildWeb2CampaignUrl() {
+      const domain = getF9Domain();
+      const phoneRaw = $('phone').value || '';
+      const phone    = sanitizePhone(phoneRaw);
+
+      const t = getTimeFormatAndValue();
+      if (!t) return { url: '', reason: 'Missing date/time' };
+
+      if (!domain) return { url: '', reason: 'Missing F9domain (set constant or add ?f9domain=...)' };
+      if (!phone)  return { url: '', reason: 'Missing Phone Number' };
+
+      const qp = [
+        urlParam('F9domain',      domain),
+        urlParam('F9list',        F9_LIST_CONSTANT),
+        urlParam('number1',       phone),
+        urlParam('F9TimeFormat',  t.F9TimeFormat),
+        urlParam('F9TimeToCall',  t.F9TimeToCall)
+      ].join('&');
+
+      return { url: `${WEB2CAMPAIGN_URL}?${qp}`, reason: '' };
+    }
+
+    function sendGetViaImage(url, onDone) {
+      const img = new Image();
+      img.onload  = () => onDone(true);
+      img.onerror = () => onDone(false);
+      img.src = url + '&_=' + Date.now(); // cache buster
+    }
+
     $('callbackForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      if (!$('callbackTime').value) { $('timePicklist').setCustomValidity('Please select a time.'); $('timePicklist').reportValidity(); return; }
-      const data = Object.fromEntries(new FormData(e.currentTarget).entries());
-      const message = [
-        'Saved ?',
-        `Name: ${data.firstName || ''} ${data.lastName || ''}`.trim(),
-        `Phone: ${data.phone || 'ó'}`,
-        `Campaign: ${data.campaign || 'ó'}`,
-        `List: ${data.list || 'ó'}`,
-        `Callback: ${data.callbackDate || 'ó'} ${data.callbackTime || ''}`.trim(),
-        `Timezone: ${data.timezone || 'ó'} (${document.getElementById('offset').value || 'ó'})`
-      ].join('  ï  ');
-      const statusEl = document.getElementById('status'); statusEl.textContent = message; statusEl.className = 'status ok';
+
+      if (!$('callbackTime').value) {
+        $('timePicklist').setCustomValidity('Please select a time.');
+        $('timePicklist').reportValidity();
+        return;
+      }
+
+      const { url, reason } = buildWeb2CampaignUrl();
+      if (!url) {
+        setStatus('Cannot call Web2Campaign: ' + reason, 'err');
+        return;
+      }
+
+      if (SHOW_DEBUG_URL) {
+        const dbg = $('debug');
+        dbg.style.display = 'block';
+        dbg.innerHTML = `<strong>Web2Campaign URL:</strong><br/><code>${url}</code>`;
+      }
+
+      setStatus('Scheduling call‚Ä¶', '');
+
+      // Fire the GET without CORS hassles (we don‚Äôt need to read the response)
+      sendGetViaImage(url, (ok) => {
+        if (ok) setStatus('Submitted to Five9 (F9TimeToCall set).', 'ok');
+        else    setStatus('Submitted (image beacon failed to load). If you need a definitive success/fail, use a server-side proxy.', 'warn');
+      });
     });
 
-    // ---------- Init ----------
+    /************ INIT ************/
     (function init() {
       // Default date = today
       const today = new Date();
       const ymd = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
-      if (!document.getElementById('callbackDate').value) document.getElementById('callbackDate').value = ymd;
-      if (!document.getElementById('callbackDateText').value) document.getElementById('callbackDateText').value = ymd;
+      if (!$('callbackDate').value) $('callbackDate').value = ymd;
+      if (!$('callbackDateText').value) $('callbackDateText').value = ymd;
+
+      // Build calendar UI
+      (function buildCalendarOnce(){
+        window.buildCalendarGrid = function(year, month) {
+          const calGrid = $('calGrid');
+          calGrid.innerHTML = '';
+          const dows = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+          for (const w of dows) {
+            const el = document.createElement('div'); el.className='dow'; el.textContent = w; calGrid.appendChild(el);
+          }
+          const first = new Date(year, month, 1);
+          const startDow = first.getDay();
+          const dim = new Date(year, month+1, 0).getDate();
+
+          for (let i=0;i<startDow;i++) calGrid.appendChild(document.createElement('div'));
+
+          const today = new Date(); const tY=today.getFullYear(), tM=today.getMonth(), tD=today.getDate();
+          for (let d=1; d<=dim; d++) {
+            const btn = document.createElement('button'); btn.type='button'; btn.className='cal-day'; btn.textContent = d;
+            if (year===tY && month===tM && d===tD) btn.classList.add('today');
+            btn.addEventListener('click', (ev) => {
+              ev.stopPropagation(); const chosen = new Date(year, month, d);
+              const ymd = `${chosen.getFullYear()}-${pad(chosen.getMonth()+1)}-${pad(chosen.getDate())}`;
+              $('callbackDate').value = ymd; $('callbackDateText').value = ymd;
+              $('calendar').classList.remove('visible'); $('callbackDateText').focus();
+            });
+            calGrid.appendChild(btn);
+          }
+
+          $('calLabel').textContent = new Date(year, month, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' });
+        };
+
+        const base = new Date();
+        window.calYear = base.getFullYear();
+        window.calMonth = base.getMonth();
+
+        $('callbackDateText').addEventListener('click', (e) => { e.stopPropagation(); buildCalendarGrid(calYear, calMonth); $('calendar').classList.add('visible'); });
+        $('callbackDateText').addEventListener('focus', (e) => { e.stopPropagation(); buildCalendarGrid(calYear, calMonth); $('calendar').classList.add('visible'); });
+        $('prevMonth').addEventListener('click', (e) => { e.stopPropagation(); calMonth--; if (calMonth<0){calMonth=11; calYear--; } buildCalendarGrid(calYear, calMonth); });
+        $('nextMonth').addEventListener('click', (e) => { e.stopPropagation(); calMonth++; if (calMonth>11){calMonth=0; calYear++; } buildCalendarGrid(calYear, calMonth); });
+        document.addEventListener('click', (e) => { if ($('calendar').classList.contains('visible')) { const inside = $('calendar').contains(e.target) || e.target === $('callbackDateText'); if (!inside) $('calendar').classList.remove('visible'); } });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') $('calendar').classList.remove('visible'); });
+      })();
 
       populateTimeZonesUS();
+
+      // Initial status hint
+      setStatus('Ready. On Save, we will call Web2Campaign with F9TimeToCall.', '');
     })();
   </script>
 </body>
