@@ -9,7 +9,7 @@
     * { box-sizing:border-box; }
     body { margin:0; padding:40px 20px; background:var(--bg); color:var(--fg); font-family: 'Inter', system-ui, sans-serif; }
     .wrap { max-width:550px; margin:0 auto; }
-    .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:30px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border:1px solid var(--border); }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:30px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
     h2 { margin:0 0 20px; font-size:1.5rem; text-align:center; color:#1e293b; }
     
     label { display:block; font-size:.875rem; font-weight:600; color:#475569; margin-bottom:6px; }
@@ -26,7 +26,6 @@
     .ok { background:#ecfdf5; color:#10b981; border-color:#d1fae5; }
     .err { background:#fef2f2; color:#ef4444; border-color:#fee2e2; }
 
-    /* Calendar - Forced Black/Bold Font for maximum visibility */
     .calendar { position:absolute; z-index:100; background:#fff; border:1px solid var(--border); border-radius:8px; width:280px; padding:10px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); display:none; }
     .calendar.visible { display:block; }
     .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
@@ -39,16 +38,19 @@
 
 <div class="wrap">
   <div class="card">
-    <h2>Schedule Callback</h2>
+    <!-- Header Updated -->
+    <h2>Schedule a Callback</h2>
     <form id="callbackForm">
       <div class="row">
         <div>
-          <label>First Name</label>
-          <input id="firstName" type="text" placeholder="John" required />
+          <label>First Name (Optional)</label>
+          <!-- Removed 'required' -->
+          <input id="firstName" type="text" placeholder="John" />
         </div>
         <div>
-          <label>Last Name</label>
-          <input id="lastName" type="text" placeholder="Doe" required />
+          <label>Last Name (Optional)</label>
+          <!-- Removed 'required' -->
+          <input id="lastName" type="text" placeholder="Doe" />
         </div>
       </div>
 
@@ -85,8 +87,8 @@
 </div>
 
 <script>
-  const F9_DOMAIN = 'Five9 TAM DEMO - Kurt Laya';
-  const F9_LIST = 'Callback';
+  const F9_DOMAIN = 'OpenHome LLC';
+  const F9_LIST = 'Scheduled Callbacks';
   const F9_API_URL = 'https://api.five9.com/web2campaign/AddToList';
 
   const $ = (id) => document.getElementById(id);
@@ -167,10 +169,8 @@
     const tzShort = new Intl.DateTimeFormat('en-US', { timeZone: tzIana, timeZoneName: 'short' })
                          .formatToParts(dt).find(p => p.type === 'timeZoneName').value;
 
-    // Standard string used for Five9 System & Custom fields
     const fullTimeStr = `${pad(m)} ${pad(d)}, ${y} ${hour}:${min} ${ampm} ${tzShort}`;
 
-    // CALL 1: System Scheduler Update
     const params1 = new URLSearchParams({
       F9domain: F9_DOMAIN,
       F9list: F9_LIST,
@@ -180,14 +180,13 @@
       F9retResults: 'false'
     });
 
-    // CALL 2: Contact Record Update (Mapping to "Scheduled Callback")
     const params2 = new URLSearchParams({
       F9domain: F9_DOMAIN,
       F9list: F9_LIST,
       number1: phone,
       first_name: $('firstName').value,
       last_name: $('lastName').value,
-      'Scheduled Callback': fullTimeStr, // Updated to your new field name
+      'Scheduled Callback': fullTimeStr,
       F9retResults: 'false'
     });
 
